@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<title>Backbone Extensions</title>
+<style>
+  body { font: 12px/18px 'Helvetica Neue', Arial, sans-serif; padding: 50px }
+</style>
+<h1>Backbone Extensions</h1>
+
+<h2>Backbone.Ext.View</h2>
+
+<h3>#release()</h3>
+
+<p>Model cleanup. By default, checks for a <code>model</code> or <code>collection</code> and unbinds all
+events on <code>this</code> context.</p>
+
+<h3>#clear()</h3>
+
+<p>Sets html to an empty string.</p>
+
+<h3>#setElement(element, [delegate])</h3>
+
+<p>Overrides the default implementation to add a <code>data-cid</code> attribute on the
+view's <code>el</code>. This is needed during child-view event delegation for routing the
+event to the correct view.</p>
+
+<h3>enableElementProxy(methods*)</h3>
+
+<p>Proxy methods to each view's <code>$el</code>. Default methods are <code>show</code> and <code>hide</code>.</p>
+
+<h2>Backbone.Ext.CompositeView</h2>
+
+<h3>#release()</h3>
+
+<p>Calls <code>release</code> on all child view also.</p>
+
+<h3>#clear()</h3>
+
+<p>Calls <code>clear</code> on each child view, and also detaches them from the DOM so they
+won't lose any of their event handlers.</p>
+
+<h3>#registerChild(view, [options])</h3>
+
+<p>Registers the view as a child. Calling <code>relase</code> or <code>clear</code> on the parent will
+also call it on any registered children. If <code>options.selector</code> is set, all
+child views registered with the same selector will have their events delegated
+by the parent view rather than having handlers on individual children. Returns
+the supplied view.</p>
+
+<h3>#deregisterChild(view)</h3>
+
+<p>Deregisters a view as a child. Returns the supplied view. Aliased to
+<code>unregisterChild</code>.</p>
+
+<h3>#placeChildren([options])</h3>
+
+<p>Finds placeholder elements and replaces them with the correct view. Placeholder
+elements are in the form <code>&lt;view data-cid="view.cid" /&gt;</code>. If <code>options.render</code>
+is set, <code>render</code> will be called on each child view as it is placed in the DOM.</p>
+
+<h3>#delegateChildEvents()</h3>
+
+<p>Sets up event delegations for all child views registered with a selector.</p>
+
+<h3>#undelegateChildEvents()</h3>
+
+<p>Removes event delegations for child views.</p>
+
+<h3>#delegateEvents([events])</h3>
+
+<p>Overriden to also call <code>delegateChildEvents</code>.</p>
+
+<h2>Caveats</h2>
+
+<ul>
+<li><code>undelegateEvents</code> is called on all child view registered with a selector,
+but <code>delegateEvents</code> will still be called on child views when they are
+instanciated. It seems a little wasteful to delegate events and then
+immediately undelegate them, but it's unavoidable since it is part of the
+<code>Backbone.View</code> constructor.</li>
+<li>Events are delegated based upon the <code>events</code> hash of the least recently
+registered child for a given selector. If a view's events are a function that
+returns a dynamic hash based upon some internal state, you're gonna have a bad
+time.</li>
+<li>Use simple selectors, namely classes or tags, when registering a child. The
+target child view is determined by calling <code>$(e.currentTarget).closest(selector)</code>
+within the event handler. If you use something like the child selector (<code>a &gt; b</code>),
+you're gonna have a bad time.</li>
+</ul>
+
+<h2>Examples</h2>
+
+<p><a href="examples/example.html">Event delegation</a></p>
