@@ -1,5 +1,8 @@
 # Backbone Extensions
 
+## Examples
+[Child view event delegation](http://natefaubion.github.com/backbone.ext/examples/example.html)
+
 ## Backbone.Ext.View
 
 ### #release()
@@ -67,7 +70,3 @@ time.
 target child view is determined by calling `$(e.currentTarget).closest(selector)`
 within the event handler. If you use something like the child selector (`a > b`),
 you're gonna have a bad time.
-
-
-## Examples
-https://natefaubion.github.com/backbone.ext/examples/example.html
