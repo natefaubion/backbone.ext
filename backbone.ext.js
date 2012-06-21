@@ -54,7 +54,7 @@
   };
 
   // jQuery/Zepto methods to proxy. This will let us just call `view.show()`
-  // and have it show the views element.
+  // and have it show the view's element.
   View.enableElementProxy('show', 'hide');
 
 
@@ -199,6 +199,92 @@
 
   // Alias `deregisterChild` to `unregisterChild`.
   CompositeView.prototype.unregisterChild = CompositeView.prototype.deregisterChild;
+
+  // Backbone.Ext.MultiRouter
+  // ------------------------
+
+  // Backbone.History only allows one callback per route, but for more modular
+  // applications, it can be helpful to have multiple routers that may share
+  // the same routes but update different parts of the application. Write your
+  // routers as you normally would, then use MultiRouter to glue them
+  // together.
+  
+  var MultiRouter = Backbone.Ext.MultiRouter = Backbone.Router.extend({
+    // Override the default constructor to initialize internal variables.
+    constructor: function (options) {
+      this._handlers = [];
+      Backbone.Router.call(this, options);
+    },
+
+    // Override so route calls run through our internal handler instead of
+    // binding directly to Backbone.history
+    route: function () {
+      var args = arguments;
+      this._bindHandlers(this, gatherHandlers(function () {
+        Backbone.Router.prototype.route.apply(this, args);
+      }, this));
+      return this;
+    },
+
+    // Given a router class and options, creates and returns a new instance
+    // whose routes run through our internal handler.
+    createRouter: function (routerClass, options) {
+      var router;
+      var handlers = gatherHandlers(function () {
+        router = new routerClass(options);
+      }, this);
+      this._bindHandlers(router, handlers);
+      return router;
+    },
+
+    // Given a route regex, registers a callback on Backbone.history that will
+    // scan through all our registered routers and invoke methods that match
+    // the route. This uses `_.any` just like Backbone.history would, so only
+    // only one route will fire _within_ each router.
+    _route: function (route) {
+      Backbone.history.route(route, _.bind(function (fragment) {
+        _.each(this._handlers, function (pair) {
+          _.any(pair[1], function (handler) {
+            if (handler.route.test(fragment)) {
+              handler.callback(fragment);
+              return true;
+            }
+          });
+        });
+      }, this));
+    },
+
+    // Given a router and a set of handlers in the form of {route, handler},
+    // push the handlers onto the internal cache and register the routes.
+    _bindHandlers: function (router, handlers) {
+      var pair = _.find(this._handlers, function (pair) {
+        return pair[0] === router;
+      });
+      if (pair) {
+        pair[1].unshift(handlers);
+      } else {
+        pair = [router, handlers];
+        this._handlers.push(pair);
+      }
+      _.each(handlers, function (handler) {
+        this._route(handler.route);
+      }, this);
+    }
+  });
+
+  // Swaps out Backbone.history.route with its own method that will gather
+  // the routes registered during the invocation of `func`.
+  var gatherHandlers = function (func, context) {
+    Backbone.history || (Backbone.history = new Backbone.History);
+    var history = {handlers: []};
+    var oldRoute = Backbone.history.route;
+    Backbone.history.route = function () {
+      oldRoute.apply(history, arguments);
+    };
+    func.call(context || window);
+    Backbone.history.route = oldRoute;
+    return history.handlers;
+  };
 
   // If the value is a function, return the result of the function.
   var getValue = function(object, prop) {
