@@ -212,7 +212,7 @@
   var MultiRouter = Backbone.Ext.MultiRouter = Backbone.Router.extend({
     // Override the default constructor to initialize internal variables.
     constructor: function (options) {
-      this._handlers = [];
+      this.routers = [];
       Backbone.Router.call(this, options);
     },
 
@@ -243,8 +243,8 @@
     // only one route will fire _within_ each router.
     _route: function (route) {
       Backbone.history.route(route, _.bind(function (fragment) {
-        _.each(this._handlers, function (pair) {
-          _.any(pair[1], function (handler) {
+        _.each(this.routers, function (pair) {
+          _.any(pair.handlers, function (handler) {
             if (handler.route.test(fragment)) {
               handler.callback(fragment);
               return true;
@@ -257,14 +257,14 @@
     // Given a router and a set of handlers in the form of {route, handler},
     // push the handlers onto the internal cache and register the routes.
     _bindHandlers: function (router, handlers) {
-      var pair = _.find(this._handlers, function (pair) {
-        return pair[0] === router;
+      var pair = _.find(this.routers, function (pair) {
+        return pair.router === router;
       });
       if (pair) {
-        pair[1].unshift(handlers);
+        pair.handlers.unshift(handlers);
       } else {
-        pair = [router, handlers];
-        this._handlers.push(pair);
+        pair = {router: router, handlers: handlers};
+        this.routers.push(pair);
       }
       _.each(handlers, function (handler) {
         this._route(handler.route);
