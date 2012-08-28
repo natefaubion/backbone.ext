@@ -99,26 +99,33 @@
 
     // Registers a view as a child. If a selector is provided,
     // `undelegateEvents` will be called on it since that means its events
-    // need to be delegated via the parent instead.
+    // need to be delegated via the parent instead. Use tha `at` option to have
+    // the view spliced into `children` at the specified index.
     registerChild: function (view, options) {
       options || (options = {});
       var cid = view.cid;
       var selector = options.selector;
+      var index = options.at != null ? options.at : this.children.length;
       if (selector) this._selectorByCid[cid] = selector, view.undelegateEvents();
-      if (!this._childrenByCid[cid]) this.children.push(view); 
+      if (!this._childrenByCid[cid]) this.children.splice(index, 0, view); 
       return this._childrenByCid[cid] = view;
     },
 
-    // Removes a child from the internal cache.
-    deregisterChild: function (view) {
-      var cid = view.cid;
-      var index = _.indexOf(this.children, view);
+    // Removes a child from the internal cache. Passing `at` as an option will
+    // deregister the child at the specified index within `children`. If an
+    // `at` index is provided, the `view` argument will be ignored.
+    deregisterChild: function (view, options) {
+      options || (options = {});
+      var index = options.at != null ? options.at : _.indexOf(this.children, view);
+      var delView;
       if (~index) {
+        delView = this.children[index];
+        var cid = delView.cid;
         delete this._childrenByCid[cid];
         delete this._selectorByCid[cid];
         this.children.splice(index, 1);
       }
-      return view;
+      return delView || false;
     },
 
     // Finds all placeholders and replaces them with the specified child views.
