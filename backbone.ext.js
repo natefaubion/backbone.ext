@@ -101,7 +101,7 @@
     // in templates.
     makePlaceholder: function (view) {
       return '<view data-cid="' + view.cid + '" />';
-    }
+    },
 
     // Registers a view as a child. If a selector is provided,
     // `undelegateEvents` will be called on it since that means its events
@@ -225,6 +225,89 @@
   // you should change this. You can also configure it on individual
   // CompositeViews by setting an attribute of the same name.
   Backbone.Ext.placeholderSelector = 'view';
+
+  // Backbone.Ext.ListView
+  // ---------------------
+
+  // A common pattern is to have a view that represents the state of a
+  // collection and its models. Given a `modelView` and `delegationSelector`,
+  // this will create a list of a views that always stay synced with the
+  // supplied collection and delegate the child views' events. This is designed
+  // to be lightweight yet powerful enough to not require subclassing. In most 
+  // cases, it should be created directly by a parent CompositeView.
+  // Consequently, it implements `initialize` and `render` methods. So if 
+  // subclassing is required, make sure to keep that in mind.
+
+  // A list of additional top level options for ListViews.
+  var listViewOptions = ['modelView', 'delegationSelector'];
+  
+  var ListView = Backbone.Ext.ListView = CompositeView.extend({
+    // Override to look out for additional top level options.
+    _configure: function (options) {
+      CompositeView.prototype._configure.call(this, options);
+      _.each(listViewOptions, function (attr) {
+        if (options[attr]) this[attr] = options[attr];
+      }, this);
+    },
+
+    // Implement an `initialize` method to setup child views and add event
+    // handlers to the collection.
+    initialize: function () {
+      this.syncViews();
+      this.collection
+        .on("add", this._addModel, this)
+        .on("remove", this._removeModel, this)
+        .on("reset", this._resetCollection, this);
+    },
+
+    // Implement a `render` methods to append and render all child views
+    render: function () {
+      this.clear();
+      _.each(this.children, function (child) {
+        this.$el.append(child.render().el);
+      }, this);
+      return this;
+    },
+
+    // Registers a child view for each model in the collection.
+    syncViews: function () {
+      this._reset();
+      this.collection.each(function (model) {
+        var view = new this.modelView({ model: model });
+        this.registerChild(view, { selector: this.delegationSelector });
+      }, this);
+    },
+
+    // Handler to respond to `add` events on the collection. Creates, registers,
+    // renders, and inserts a new child view for the new model.
+    _addModel: function (model, collection, options) {
+      var index = options.index;
+      var view = new this.modelView({ model: model });
+      this.registerChild(view, { selector: this.delegationSelector, at: index });
+
+      var el = view.render().el;
+      if (index === 0) this.$el.prepend(el);
+      else if (index === this.children.length - 1) this.$el.append(el);
+      else this.$el.children().eq(index).before(el);
+    },
+
+    // Handler to respond to `remove` events on the collection. Deregisters,
+    // removes, and releases the child view associated with the model.
+    _removeModel: function (model, collection, options) {
+      var view = this.deregisterChild(null, { at: options.index });
+      view.remove().release();
+    },
+
+    // Handler to respond to `reset` events on the collection. Removes and
+    // releases the old views, resyncs the views, and rerenders.
+    _resetCollection: function (collection) {
+      _.each(this.children, function (child) {
+        child.remove().release();
+      });
+      this.syncViews();
+      this.render();
+    }
+  });
 
   // Backbone.Ext.MultiRouter
   // ------------------------
