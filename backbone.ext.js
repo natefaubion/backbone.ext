@@ -39,6 +39,12 @@
       // Add a custom attribute to the element for delegation tracking
       this.$el.attr('data-cid', this.cid);
       return this;
+    },
+
+    // Generates placeholder html for this particular view. This may be called
+    // in a template for a CompositeView.
+    placeholder: function () {
+      return '<view data-cid="' + this.cid + '" />';
     }
   });
 
@@ -119,7 +125,8 @@
     placeChildren: function (options) {
       options || (options = {});
       var byCid = this._childrenByCid;
-      this.$('view').each(function () {
+      var selector = this.placeholderSelector || Backbone.Ext.placeholderSelector;
+      this.$(selector).each(function () {
         var $el = $(this), cid = $el.attr('data-cid');
         var view = byCid[cid];
         if (view) {
@@ -200,6 +207,12 @@
   // Alias `deregisterChild` to `unregisterChild`.
   CompositeView.prototype.unregisterChild = CompositeView.prototype.deregisterChild;
 
+  // Selector used to find placeholder tags. If you override the default
+  // `placeholder` method on Backbone.Ext.View to spit out a different tag,
+  // you should change this. You can also configure it on individual
+  // CompositeViews by setting an attribute of the same name.
+  Backbone.Ext.placeholderSelector = 'view';
+
   // Backbone.Ext.MultiRouter
   // ------------------------
 
@@ -212,7 +225,7 @@
   var MultiRouter = Backbone.Ext.MultiRouter = Backbone.Router.extend({
     // Override the default constructor to initialize internal variables.
     constructor: function (options) {
-      this.routers = [];
+      this._handlers = [];
       Backbone.Router.call(this, options);
     },
 
@@ -243,8 +256,8 @@
     // only one route will fire _within_ each router.
     _route: function (route) {
       Backbone.history.route(route, _.bind(function (fragment) {
-        _.each(this.routers, function (pair) {
-          _.any(pair.handlers, function (handler) {
+        _.each(this._handlers, function (pair) {
+          _.any(pair[1], function (handler) {
             if (handler.route.test(fragment)) {
               handler.callback(fragment);
               return true;
@@ -257,14 +270,14 @@
     // Given a router and a set of handlers in the form of {route, handler},
     // push the handlers onto the internal cache and register the routes.
     _bindHandlers: function (router, handlers) {
-      var pair = _.find(this.routers, function (pair) {
-        return pair.router === router;
+      var pair = _.find(this._handlers, function (pair) {
+        return pair[0] === router;
       });
       if (pair) {
-        pair.handlers.unshift(handlers);
+        pair[1].unshift(handlers);
       } else {
-        pair = {router: router, handlers: handlers};
-        this.routers.push(pair);
+        pair = [router, handlers];
+        this._handlers.push(pair);
       }
       _.each(handlers, function (handler) {
         this._route(handler.route);
