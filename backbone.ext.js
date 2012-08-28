@@ -21,8 +21,14 @@
     // The default release method checks for a `model` or `collection` and
     // unbinds events associated with `this` context.
     release: function () {
-      if (this.model) this.model.off(null, null, this);
-      if (this.collection) this.collection.off(null, null, this);
+      if (this.model) {
+        this.model.off(null, null, this);
+        this.model = null;
+      }
+      if (this.collection) {
+        this.collection.off(null, null, this);
+        this.collection = null;
+      }
       return this;  
     },
 
