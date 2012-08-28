@@ -45,12 +45,6 @@
       // Add a custom attribute to the element for delegation tracking
       this.$el.attr('data-cid', this.cid);
       return this;
-    },
-
-    // Generates placeholder html for this particular view. This may be called
-    // in a template for a CompositeView.
-    placeholder: function () {
-      return '<view data-cid="' + this.cid + '" />';
     }
   });
 
@@ -102,6 +96,12 @@
       this._clearChildren();
       return View.prototype.clear.call(this);
     },
+
+    // Generates placeholder html for the supplied view. This should be called
+    // in templates.
+    makePlaceholder: function (view) {
+      return '<view data-cid="' + view.cid + '" />';
+    }
 
     // Registers a view as a child. If a selector is provided,
     // `undelegateEvents` will be called on it since that means its events
