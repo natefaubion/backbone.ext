@@ -255,9 +255,9 @@
     initialize: function () {
       this.syncViews();
       this.collection
-        .on("add", this._addModel, this)
-        .on("remove", this._removeModel, this)
-        .on("reset", this._resetCollection, this);
+        .on('add', this._addModel, this)
+        .on('remove', this._removeModel, this)
+        .on('reset', this._resetCollection, this);
     },
 
     // Implement a `render` methods to append and render all child views
