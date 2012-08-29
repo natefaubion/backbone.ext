@@ -99,7 +99,7 @@
 
     // Generates placeholder html for the supplied view. This should be called
     // in templates.
-    makePlaceholder: function (view) {
+    placeholderFor: function (view) {
       return '<view data-cid="' + view.cid + '" />';
     },
 
