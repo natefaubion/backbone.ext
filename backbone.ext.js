@@ -188,7 +188,7 @@
     // curried with the selector and method. It grabs the cid from the
     // target element and calls the method on the appropriate view.
     _childEventProxy: function (selector, method, e) {
-      var cid = $(e.currentTarget).closest(selector).attr('data-cid')
+      var cid = $(e.currentTarget).closest(selector + '[data-cid]').attr('data-cid')
       var view = this._childrenByCid[cid];
       if (!_.isFunction(method)) method = view[method];
       return method.call(view, e);
