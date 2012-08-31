@@ -194,6 +194,7 @@ App.ContactsView = Backbone.Ext.CompositeView.extend({
       tagName: "ul",
       className: "contacts",
       modelView: App.ContactListItemView,
+      emptyTemplate: App.templates.contactListEmpty,
       delegationSelector: ".contact",
       collection: App.contacts
     });
@@ -238,7 +239,14 @@ App.ContactListItemView = Backbone.Ext.View.extend({
 App.ContactView = Backbone.Ext.View.extend({
   className : "contact-card",
   template  : App.templates.contactCard,
-  render    : App.helpers.modelRender("contact")
+  render    : App.helpers.modelRender("contact"),
+
+  show: function () {
+    var inner = this.$(".contact-card-inner");
+    Backbone.Ext.View.prototype.show.call(this);
+    _.defer(function () { inner.addClass("visible") });
+    return this;
+  }
 });
 
 // ContactFormView
