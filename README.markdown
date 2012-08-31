@@ -1,7 +1,7 @@
 # Backbone Extensions
 
-## Examples
-[Child view event delegation](http://natefaubion.github.com/backbone.ext/examples/example.html)
+## Example
+[Example contacts app](http://natefaubion.github.com/backbone.ext/example/)
 
 ## Backbone.Ext.View
 Extends the default `Backbone.View` with placeholder methods for clearing the
