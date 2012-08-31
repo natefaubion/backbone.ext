@@ -112,13 +112,22 @@ h1 {
   position: relative;
 }
 
+.contacts .no-contacts {
+  border: none;
+  color: #aaa;
+  line-height: 2.4;
+  text-align: center;
+}
+
 .contacts a {
   display: block;
   line-height: 2.4;
+  padding: 0 0 0 .6em;
   text-decoration: none;
 }
 
 .contacts a:hover {
+  background-color: #f5f5f5;
   color: #000;
 }
 
@@ -127,8 +136,7 @@ h1 {
   cursor: pointer;
   height: 2.4em;
   line-height: 2.4;
-  text-align: center;
-  width: 2em;
+  padding: 0 .6em;
   position: absolute;
   top: 0;
   right: 0;
@@ -152,12 +160,22 @@ h1 {
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0,0,0,.4);
   height: 16em;
-  margin: -10em 0 0 -12em;
+  margin: -16em 0 0 -12em;
+  opacity: 0;
   padding: 2em;
   width: 24em;
   position: absolute;
   top: 50%;
   left: 50%;
+
+  -webkit-transition: all .3s ease-out;
+  -moz-transition: all .3s ease-out;
+  transition: all .3s ease-out;
+}
+
+.contact-card-inner.visible {
+  margin-top: -10em;
+  opacity: 1;
 }
 
 .contact-card h2 {

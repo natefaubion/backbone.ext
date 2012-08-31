@@ -44,14 +44,19 @@
   </script>
   <script type="text/tmpl" data-name="contactForm">
     <h2>New Contact</h3>
-    <p><input type="text" name="name" placeholder="Name" /></p>
-    <p><input type="text" name="phone" placeholder="Phone" /></p>
-    <p><input type="text" name="email" placeholder="Email" /></p>
+    <p><input type="text" name="name" placeholder="Name" required /></p>
+    <p><input type="text" name="phone" placeholder="Phone" required /></p>
+    <p><input type="text" name="email" placeholder="Email" required /></p>
     <p><button>Add</button></p>
   </script>
   <script type="text/tmpl" data-name="contactListItem">
     <a href="#/contacts/<%= contact.id %>"><%- contact.name %></a>
     <span class="destroy">&times;</span>
+  </script>
+  <script type="text/tmpl" data-name="contactListEmpty">
+    <li class="no-contacts">
+      No contacts to display
+    </li>
   </script>
   <script type="text/tmpl" data-name="contactCard">
     <div class="contact-card-inner">
