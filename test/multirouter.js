@@ -46,8 +46,8 @@ $(function () {
 
   test('create router', 3, function () {
     ok(router.a instanceof RouterA);
-    equal(router._handlers.length, 3);
-    equal(router._handlers[1][1].length, 2);
+    equal(router.routers.length, 3);
+    equal(router.routers[1].handlers.length, 2);
   });
 
   test('routing', 3, function () {
