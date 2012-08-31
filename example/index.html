@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Backbone.Ext Example Application</title>
+  <link href="css/app.css" rel="stylesheet">
+</head>
+<body>
+  <!-- App Templates -->
+  <script type="text/tmpl" data-name="app">
+    <div class="hd">
+      <h1>Backbone.Ext Example</h1>
+      <%= this.placeholderFor(this.navView) %>
+    </div>
+    <div class="bd">
+      <%= this.placeholderFor(this.homeView) %>
+      <%= this.placeholderFor(this.contactsView) %>
+    </div>
+  </script>
+  <script type="text/tmpl" data-name="nav">
+    <li data-name="home"><a href="#/">Home</a></li>
+    <li data-name="contacts"><a href="#/contacts/">Contacts</a></li>
+  </script>
+  <script type="text/tmpl" data-name="home">
+    <p>This example application has 3 routers: one for the app structure, one
+    for the navigation bar, and on for the contacts page. Their routes overlap,
+    but don't cancel each other out. They can each listen to only the routes
+    that are important to fulfill their function.</p>
+
+    <p>The main app view is a CompositeView. The position of child views are
+    set within the template using placeholders instead of being spliced in
+    after the fact.</p>
+
+    <p>The contacts view contains a ListView that always reflects the current
+    state of the contacts collection. No boilerplate is necessary.</p>
+  </script>
+  <script type="text/tmpl" data-name="contacts">
+    <div class="side-col">
+      <%= this.placeholderFor(this.formView) %>
+    </div>
+    <div class="main-col">
+      <%= this.placeholderFor(this.listView) %>
+    </div>
+  </script>
+  <script type="text/tmpl" data-name="contactForm">
+    <h2>New Contact</h3>
+    <p><input type="text" name="name" placeholder="Name" /></p>
+    <p><input type="text" name="phone" placeholder="Phone" /></p>
+    <p><input type="text" name="email" placeholder="Email" /></p>
+    <p><button>Add</button></p>
+  </script>
+  <script type="text/tmpl" data-name="contactListItem">
+    <a href="#/contacts/<%= contact.id %>"><%- contact.name %></a>
+    <span class="destroy">&times;</span>
+  </script>
+  <script type="text/tmpl" data-name="contactCard">
+    <div class="contact-card-inner">
+      <h2><%- contact.name %></h2>
+      <table cellpadding="0" cellspacing="0">
+        <tr>
+          <th>Phone</th>
+          <td><%- contact.phone %></td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td><%- contact.email %></td>
+        </tr>
+      </table>
+      <div class="close">
+        <a href="#/contacts/">Close</a>
+      </div>
+    </div>
+  </script>
+
+  <!-- App source -->
+  <script src="../vendor/jquery.js"></script>
+  <script src="../vendor/underscore.js"></script>
+  <script src="../vendor/backbone.js"></script>
+  <script src="../backbone.ext.js"></script>
+  <script src="js/myapp.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <script>
+    $(function () {
+      // Initialize the application and router
+      App.app = new App.AppView();
+      App.router = new App.AppRouter({ view: App.app });
+
+      // Add the app to the page
+      $("body").append(App.app.render().el);
+
+      // Start routing
+      Backbone.history.start();
+    });
+  </script>
+</body>
+</html>
