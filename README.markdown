@@ -1,31 +1,31 @@
 # Backbone Extensions
 
-## Example
+### Example
 [Example contacts app](http://natefaubion.github.com/backbone.ext/example/)
 
-## Backbone.Ext.View
+### Backbone.Ext.View
 Extends the default `Backbone.View` with placeholder methods for clearing the
 element and doing any event handler cleanup. It also ensures that all view
 elements will have a `data-cid` attribute for referencing views so we can
 direct delegated events to the correct child view.
 
-### view.release()
+#### view.release()
 Model cleanup. By default, checks for a `model` or `collection` and unbinds all
 events on the `this` context.
 
-### view.clear()
+#### view.clear()
 Sets `$el.html` to an empty string.
 
-### view.setElement(element, [delegate])
+#### view.setElement(element, [delegate])
 Overrides the default implementation to add a `data-cid` attribute on the
 view's `el`. This is needed during child-view event delegation for routing the
 event to the correct view.
 
-### Backbone.Ext.View.enableElementProxy(methods...)
+#### Backbone.Ext.View.enableElementProxy(methods...)
 Proxy methods to each view's `$el`. Default methods are `show` and `hide`.
 
 
-## Backbone.Ext.CompositeView
+### Backbone.Ext.CompositeView
 A special view that lets you register child views that can then have their
 events delegated. This lets you write your child views like they are handling
 their own events, but have the parent CompositeView act as a delegate so you
@@ -49,14 +49,14 @@ var MyView = Backbone.Ext.CompositeView.extend({
 });
 ```
 
-### view.release()
+#### view.release()
 Calls `release` on all child views also.
 
-### view.clear()
+#### view.clear()
 Calls `clear` on all child views and detaches them from the DOM so they won't
 lose their event handlers.
 
-### view.registerChild(childView, [options])
+#### view.registerChild(childView, [options])
 Registers the view as a child. Calling `relase` or `clear` on the parent will
 also call it on any registered children. If `options.selector` is set, all
 child views registered with the same selector will have their events delegated
@@ -75,17 +75,17 @@ target child view. The target child view is determined by walking up the DOM
 hierarchy using `$(e.currentTarget).closest(selector + '[data-cid]')` within
 the event handler.
 
-### view.deregisterChild(childView, [options])
+#### view.deregisterChild(childView, [options])
 Deregisters a view as a child. Returns the supplied view. Aliased to
 `unregisterChild`. If `options.at` is set, the view at the specified index will
 be removed and the first paramater will be ignored.
 
-### view.placeChildren([options])
+#### view.placeChildren([options])
 Finds placeholder elements and replaces them with the correct view. If 
 `options.render` is set, `render` will be called on each child view as it is 
 placed in the DOM.
 
-### view.placeholderFor(childView)
+#### view.placeholderFor(childView)
 Given a view, returns a placeholder html string that can be used in a template
 and later replaced by `placeChildren`. The default implementation returns
 a string in the form of `<view data-cid="view.cid" />` by default. The
@@ -93,26 +93,26 @@ a string in the form of `<view data-cid="view.cid" />` by default. The
 override this method to return a different string, be sure to change
 `placeholderSelector` also.
 
-### view.delegateChildEvents()
+#### view.delegateChildEvents()
 Sets up event delegations for all child views registered with a selector.
 
-### view.undelegateChildEvents()
+#### view.undelegateChildEvents()
 Removes event delegations for child views.
 
-### view.delegateEvents([events])
+#### view.delegateEvents([events])
 Overriden to also call `delegateChildEvents`.
 
-### view.children
+#### view.children
 An array of the currently registered children. This should never be modified
 directly. Use `registerChild` and `deregisterChild` instead.
 
-### Backbone.Ext.CompositeView.placeholderSelector
+#### Backbone.Ext.CompositeView.placeholderSelector
 A string selector used to find placeholder elements. Defaults to `'view'`. This
 can be set globally on `Backbone.Ext.CompositeView` or overridden on individual
 views by setting an attribute of the same name.
 
 
-## Backbone.Ext.ListView
+### Backbone.Ext.ListView
 A common pattern is to have a view that represents the state of a collection
 and its models. Given a `modelView` and `delegationSelector`, this will create
 a list of a views that always stay synced with the supplied collection and
@@ -127,19 +127,24 @@ var listView = new Backbone.Ext.ListView({
   tagName: "ul",
   modelView: ListItemView,
   delegationSelector: "li",
+  emptyTemplate: "No items to display",
   collection: myCollection
 });
 ```
 
-### view.syncViews()
+#### view.syncViews()
 Creates a child view for each model in the view's collection, and registers it
 as a child. If a `delegationSelector` was supplied, it will make sure the
 events are delegated by the list view. This is called automatically on view
 initialization and on collection `refresh` events. You should not need to call
 this manually unless overriding the default behavior.
 
+#### view.emptyTemplate
+This can be a string or a function. Set this so that something is displayed
+even when no models are in your collection.
 
-## Backbone.Ext.MultiRouter
+
+### Backbone.Ext.MultiRouter
 Backbone.History only allows one callback per route, but for more modular
 applications, it can be helpful to have multiple routers that may share the
 same or similar routes but update different parts of the application. Write
@@ -158,7 +163,7 @@ var MyAppRouter = Backbone.Ext.MultiRouter.extend({
 });
 ```
 
-### multi.createRouter(routerClass, [options])
+#### multi.createRouter(routerClass, [options])
 A factory method to instanciate a new router. To multiplex your routes, the
 router must be created using `createRouter`. An optional `options` object will
 be passed on to your new router.
