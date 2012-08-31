@@ -1,91 +1,228 @@
-<!DOCTYPE HTML>
-<title>Backbone Extensions</title>
-<style>
-  body { font: 12px/18px 'Helvetica Neue', Arial, sans-serif; padding: 50px }
-</style>
-<h1>Backbone Extensions</h1>
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Backbone.Ext : Extensions for Backbone.js" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Backbone.Ext</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/natefaubion/backbone.ext">View on GitHub</a>
+
+          <h1 id="project_title">Backbone.Ext</h1>
+          <h2 id="project_tagline">Extensions for Backbone.js</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/natefaubion/backbone.ext/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/natefaubion/backbone.ext/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>Backbone Extensions</h1>
+
+<h2>Example</h2>
+
+<p><a href="http://natefaubion.github.com/backbone.ext/example/">Example contacts app</a></p>
 
 <h2>Backbone.Ext.View</h2>
 
-<h3>#release()</h3>
+<p>Extends the default <code>Backbone.View</code> with placeholder methods for clearing the
+element and doing any event handler cleanup. It also ensures that all view
+elements will have a <code>data-cid</code> attribute for referencing views so we can
+direct delegated events to the correct child view.</p>
+
+<h3>view.release()</h3>
 
 <p>Model cleanup. By default, checks for a <code>model</code> or <code>collection</code> and unbinds all
-events on <code>this</code> context.</p>
+events on the <code>this</code> context.</p>
 
-<h3>#clear()</h3>
+<h3>view.clear()</h3>
 
-<p>Sets html to an empty string.</p>
+<p>Sets <code>$el.html</code> to an empty string.</p>
 
-<h3>#setElement(element, [delegate])</h3>
+<h3>view.setElement(element, [delegate])</h3>
 
 <p>Overrides the default implementation to add a <code>data-cid</code> attribute on the
 view's <code>el</code>. This is needed during child-view event delegation for routing the
 event to the correct view.</p>
 
-<h3>enableElementProxy(methods*)</h3>
+<h3>Backbone.Ext.View.enableElementProxy(methods...)</h3>
 
 <p>Proxy methods to each view's <code>$el</code>. Default methods are <code>show</code> and <code>hide</code>.</p>
 
 <h2>Backbone.Ext.CompositeView</h2>
 
-<h3>#release()</h3>
+<p>A special view that lets you register child views that can then have their
+events delegated. This lets you write your child views like they are handling
+their own events, but have the parent CompositeView act as a delegate so you
+don't have thousands of event handlers for views with many children. It also
+provides a method for replacing placeholder elements with the correct child
+views.</p>
 
-<p>Calls <code>release</code> on all child view also.</p>
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">MyView</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Ext</span><span class="p">.</span><span class="nx">CompositeView</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">template</span><span class="o">:</span> <span class="nx">_</span><span class="p">.</span><span class="nx">template</span><span class="p">(</span><span class="s2">"&lt;%= this.placeholderFor(this.childView) %&gt;"</span><span class="p">),</span>
+  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">childView</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">registerChild</span><span class="p">(</span><span class="k">new</span> <span class="nx">ChildView</span><span class="p">(),</span> <span class="p">{</span>
+      <span class="nx">selector</span><span class="o">:</span> <span class="s2">".child-view"</span>
+    <span class="p">});</span>
+  <span class="p">},</span>
+  <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">$el</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">template</span><span class="p">());</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">placeChildren</span><span class="p">({</span><span class="nx">render</span><span class="o">:</span> <span class="kc">true</span><span class="p">});</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
 
-<h3>#clear()</h3>
+<h3>view.release()</h3>
 
-<p>Calls <code>clear</code> on each child view, and also detaches them from the DOM so they
-won't lose any of their event handlers.</p>
+<p>Calls <code>release</code> on all child views also.</p>
 
-<h3>#registerChild(view, [options])</h3>
+<h3>view.clear()</h3>
+
+<p>Calls <code>clear</code> on all child views and detaches them from the DOM so they won't
+lose their event handlers.</p>
+
+<h3>view.registerChild(childView, [options])</h3>
 
 <p>Registers the view as a child. Calling <code>relase</code> or <code>clear</code> on the parent will
 also call it on any registered children. If <code>options.selector</code> is set, all
 child views registered with the same selector will have their events delegated
-by the parent view rather than having handlers on individual children. Returns
-the supplied view.</p>
+by the parent view rather than having handlers on individual children. If
+<code>options.at</code> is set, the child view will be inserted into <code>children</code> at the
+specified index. Returns the supplied view.</p>
 
-<h3>#deregisterChild(view)</h3>
+<p>Events are delegated based upon the <code>events</code> hash of the least recently
+registered child for a given selector. If a view's events are a function that
+returns a dynamic hash based upon some internal state, you should not use event
+delegation.</p>
+
+<p>Use simple, yet specific, selectors when registering a child. The selector is
+used in two places: settings up event delegations on the parent and finding the
+target child view. The target child view is determined by walking up the DOM
+hierarchy using <code>$(e.currentTarget).closest(selector + '[data-cid]')</code> within
+the event handler.</p>
+
+<h3>view.deregisterChild(childView, [options])</h3>
 
 <p>Deregisters a view as a child. Returns the supplied view. Aliased to
-<code>unregisterChild</code>.</p>
+<code>unregisterChild</code>. If <code>options.at</code> is set, the view at the specified index will
+be removed and the first paramater will be ignored.</p>
 
-<h3>#placeChildren([options])</h3>
+<h3>view.placeChildren([options])</h3>
 
-<p>Finds placeholder elements and replaces them with the correct view. Placeholder
-elements are in the form <code>&lt;view data-cid="view.cid" /&gt;</code>. If <code>options.render</code>
-is set, <code>render</code> will be called on each child view as it is placed in the DOM.</p>
+<p>Finds placeholder elements and replaces them with the correct view. If 
+<code>options.render</code> is set, <code>render</code> will be called on each child view as it is 
+placed in the DOM.</p>
 
-<h3>#delegateChildEvents()</h3>
+<h3>view.placeholderFor(childView)</h3>
+
+<p>Given a view, returns a placeholder html string that can be used in a template
+and later replaced by <code>placeChildren</code>. The default implementation returns
+a string in the form of <code>&lt;view data-cid="view.cid" /&gt;</code> by default. The
+<code>data-cid</code> attribute is used to lookup the correct replacement view. If you
+override this method to return a different string, be sure to change
+<code>placeholderSelector</code> also.</p>
+
+<h3>view.delegateChildEvents()</h3>
 
 <p>Sets up event delegations for all child views registered with a selector.</p>
 
-<h3>#undelegateChildEvents()</h3>
+<h3>view.undelegateChildEvents()</h3>
 
 <p>Removes event delegations for child views.</p>
 
-<h3>#delegateEvents([events])</h3>
+<h3>view.delegateEvents([events])</h3>
 
 <p>Overriden to also call <code>delegateChildEvents</code>.</p>
 
-<h2>Caveats</h2>
+<h3>view.children</h3>
 
-<ul>
-<li><code>undelegateEvents</code> is called on all child view registered with a selector,
-but <code>delegateEvents</code> will still be called on child views when they are
-instanciated. It seems a little wasteful to delegate events and then
-immediately undelegate them, but it's unavoidable since it is part of the
-<code>Backbone.View</code> constructor.</li>
-<li>Events are delegated based upon the <code>events</code> hash of the least recently
-registered child for a given selector. If a view's events are a function that
-returns a dynamic hash based upon some internal state, you're gonna have a bad
-time.</li>
-<li>Use simple selectors, namely classes or tags, when registering a child. The
-target child view is determined by calling <code>$(e.currentTarget).closest(selector)</code>
-within the event handler. If you use something like the child selector (<code>a &gt; b</code>),
-you're gonna have a bad time.</li>
-</ul>
+<p>An array of the currently registered children. This should never be modified
+directly. Use <code>registerChild</code> and <code>deregisterChild</code> instead.</p>
 
-<h2>Examples</h2>
+<h3>Backbone.Ext.CompositeView.placeholderSelector</h3>
 
-<p><a href="examples/example.html">Event delegation</a></p>
+<p>A string selector used to find placeholder elements. Defaults to <code>'view'</code>. This
+can be set globally on <code>Backbone.Ext.CompositeView</code> or overridden on individual
+views by setting an attribute of the same name.</p>
+
+<h2>Backbone.Ext.ListView</h2>
+
+<p>A common pattern is to have a view that represents the state of a collection
+and its models. Given a <code>modelView</code> and <code>delegationSelector</code>, this will create
+a list of a views that always stay synced with the supplied collection and
+delegate the child views' events. This is designed to be lightweight yet
+powerful enough to not require subclassing. In most cases, it should be created
+directly by a parent CompositeView.  Consequently, it implements <code>initialize</code>
+and <code>render</code> methods. So if subclassing is required, make sure to keep that in
+mind.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">listView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Ext</span><span class="p">.</span><span class="nx">ListView</span><span class="p">({</span>
+  <span class="nx">tagName</span><span class="o">:</span> <span class="s2">"ul"</span><span class="p">,</span>
+  <span class="nx">modelView</span><span class="o">:</span> <span class="nx">ListItemView</span><span class="p">,</span>
+  <span class="nx">delegationSelector</span><span class="o">:</span> <span class="s2">"li"</span><span class="p">,</span>
+  <span class="nx">collection</span><span class="o">:</span> <span class="nx">myCollection</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>view.syncViews()</h3>
+
+<p>Creates a child view for each model in the view's collection, and registers it
+as a child. If a <code>delegationSelector</code> was supplied, it will make sure the
+events are delegated by the list view. This is called automatically on view
+initialization and on collection <code>refresh</code> events. You should not need to call
+this manually unless overriding the default behavior.</p>
+
+<h2>Backbone.Ext.MultiRouter</h2>
+
+<p>Backbone.History only allows one callback per route, but for more modular
+applications, it can be helpful to have multiple routers that may share the
+same or similar routes but update different parts of the application. Write
+your routers as you normally would using <code>Backbone.Router</code>, then use
+<code>MultiRouter</code> to glue them together. <code>MultiRouter</code> is also a router itself, so
+it can have routes and callbacks of its own which will be executed before other
+routes.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">MyAppRouter</span> <span class="o">=</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Ext</span><span class="p">.</span><span class="nx">MultiRouter</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+  <span class="nx">initialize</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">nav</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createRouter</span><span class="p">(</span><span class="nx">NavRouter</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">todos</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createRouter</span><span class="p">(</span><span class="nx">TodosRouter</span><span class="p">);</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">notes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">createRouter</span><span class="p">(</span><span class="nx">NotesRouter</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>multi.createRouter(routerClass, [options])</h3>
+
+<p>A factory method to instanciate a new router. To multiplex your routes, the
+router must be created using <code>createRouter</code>. An optional <code>options</code> object will
+be passed on to your new router.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Backbone.Ext maintained by <a href="https://github.com/natefaubion">natefaubion</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
