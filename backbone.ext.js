@@ -239,7 +239,7 @@
   // subclassing is required, make sure to keep that in mind.
 
   // A list of additional top level options for ListViews.
-  var listViewOptions = ['modelView', 'delegationSelector'];
+  var listViewOptions = ['modelView', 'emptyTemplate', 'delegationSelector'];
   
   var ListView = Backbone.Ext.ListView = CompositeView.extend({
     // Override to look out for additional top level options.
@@ -262,6 +262,7 @@
 
     // Implement a `render` methods to append and render all child views
     render: function () {
+      if (this.collection.length === 0) return this.renderEmpty();
       this.clear();
       _.each(this.children, function (child) {
         this.$el.append(child.render().el);
@@ -278,9 +279,19 @@
       }, this);
     },
 
+    // Renders the `emptyView` and sets it as the el's html.
+    renderEmpty: function () {
+      var empty = this.emptyTemplate;
+      var html = _.isFunction(empty) ? empty.call(this) : empty;
+      this.clear().$el.html(html);
+      return this;
+    },
+
     // Handler to respond to `add` events on the collection. Creates, registers,
     // renders, and inserts a new child view for the new model.
     _addModel: function (model, collection, options) {
+      // Clear in case an `emptyView` is there.
+      if (collection.length === 1) this.clear();
       var index = options.index;
       var view = new this.modelView({ model: model });
       this.registerChild(view, { selector: this.delegationSelector, at: index });
@@ -296,6 +307,7 @@
     _removeModel: function (model, collection, options) {
       var view = this.deregisterChild(null, { at: options.index });
       view.remove().release();
+      if (collection.length === 0) this.renderEmpty();
     },
 
     // Handler to respond to `reset` events on the collection. Removes and
