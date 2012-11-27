@@ -9,7 +9,7 @@ $(function () {
     }
   });
 
-  module('Backbone.Ext.ListView', {
+  module('Backbone.Ext.CollectionView', {
     setup: function () {
       values = new Backbone.Collection();
       values.comparator = function (m) { return m.get('value'); };
@@ -18,7 +18,7 @@ $(function () {
         {value: 2},
         {value: 3}
       ]);
-      listView = new Backbone.Ext.ListView({
+      listView = new Backbone.Ext.CollectionView({
         modelView: ItemView,
         collection: values
       });

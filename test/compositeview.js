@@ -92,9 +92,9 @@ $(function () {
     equal(child.el.innerHTML, '');
   });
 
-  test('release', 1, function () {
+  test('dispose', 1, function () {
     model.trigger('change');
-    parent.release();
+    parent.dispose();
     model.trigger('change');
     equal(count, 2);
   });

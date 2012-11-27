@@ -190,7 +190,7 @@ App.ContactsView = Backbone.Ext.CompositeView.extend({
   template  : App.templates.contacts,
 
   initialize: function () {
-    var listView = new Backbone.Ext.ListView({
+    var listView = new Backbone.Ext.CollectionView({
       tagName: "ul",
       className: "contacts",
       modelView: App.ContactListItemView,

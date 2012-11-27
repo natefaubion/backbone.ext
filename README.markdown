@@ -9,7 +9,7 @@ element and doing any event handler cleanup. It also ensures that all view
 elements will have a `data-cid` attribute for referencing views so we can
 direct delegated events to the correct child view.
 
-#### view.release()
+#### view.dispose()
 Model cleanup. By default, checks for a `model` or `collection` and unbinds all
 events on the `this` context.
 
@@ -49,8 +49,8 @@ var MyView = Backbone.Ext.CompositeView.extend({
 });
 ```
 
-#### view.release()
-Calls `release` on all child views also.
+#### view.dispose()
+Calls `dispose` on all child views also.
 
 #### view.clear()
 Calls `clear` on all child views and detaches them from the DOM so they won't
@@ -112,7 +112,7 @@ can be set globally on `Backbone.Ext.CompositeView` or overridden on individual
 views by setting an attribute of the same name.
 
 
-### Backbone.Ext.ListView
+### Backbone.Ext.CollectionView
 A common pattern is to have a view that represents the state of a collection
 and its models. Given a `modelView` and `delegationSelector`, this will create
 a list of a views that always stay synced with the supplied collection and
@@ -123,7 +123,7 @@ and `render` methods. So if subclassing is required, make sure to keep that in
 mind.
 
 ```js
-var listView = new Backbone.Ext.ListView({
+var listView = new Backbone.Ext.CollectionView({
   tagName: "ul",
   modelView: ListItemView,
   delegationSelector: "li",

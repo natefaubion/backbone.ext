@@ -37,11 +37,11 @@ $(function () {
     equal(view.el.innerHTML, '');
   });
 
-  test('release', 1, function () {
+  test('dispose', 1, function () {
     model.trigger('change');
     collection.trigger('change');
 
-    view.release();
+    view.dispose();
 
     model.trigger('change');
     collection.trigger('change');

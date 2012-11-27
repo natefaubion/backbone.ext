@@ -18,9 +18,9 @@
   // all view elements will have a `data-cid` attribute for referencing views
   // so we can direct delegated events to the correct child view.
   var View = Backbone.Ext.View = Backbone.View.extend({
-    // The default release method checks for a `model` or `collection` and
+    // The default dispose method checks for a `model` or `collection` and
     // unbinds events associated with `this` context.
-    release: function () {
+    dispose: function () {
       if (this.model) {
         this.model.off(null, null, this);
         this.model = null;
@@ -85,10 +85,10 @@
     },
 
     // Release child views and clear caches
-    release: function () {
-      this._releaseChildren();
+    dispose: function () {
+      this._disposeChildren();
       this._reset();
-      return View.prototype.release.call(this);
+      return View.prototype.dispose.call(this);
     },
 
     // Clear child views first
@@ -194,9 +194,9 @@
       return method.call(view, e);
     },
 
-    // Call `release` on all the children.
-    _releaseChildren: function () {
-      _.invoke(this.children, 'release');
+    // Call `dispose` on all the children.
+    _disposeChildren: function () {
+      _.invoke(this.children, 'dispose');
     },
 
     // Call `clear` on all the children and detach it from the DOM so they
@@ -226,26 +226,26 @@
   // CompositeViews by setting an attribute of the same name.
   Backbone.Ext.placeholderSelector = 'view';
 
-  // Backbone.Ext.ListView
+  // Backbone.Ext.CollectionView
   // ---------------------
 
   // A common pattern is to have a view that represents the state of a
   // collection and its models. Given a `modelView` and `delegationSelector`,
-  // this will create a list of a views that always stay synced with the
+  // this will create a series of views that always stay synced with the
   // supplied collection and delegate the child views' events. This is designed
   // to be lightweight yet powerful enough to not require subclassing. In most 
   // cases, it should be created directly by a parent CompositeView.
   // Consequently, it implements `initialize` and `render` methods. So if 
   // subclassing is required, make sure to keep that in mind.
 
-  // A list of additional top level options for ListViews.
-  var listViewOptions = ['modelView', 'emptyTemplate', 'delegationSelector'];
+  // A list of additional top level options for CollectionViews.
+  var collViewOptions = ['modelView', 'emptyTemplate', 'delegationSelector'];
   
-  var ListView = Backbone.Ext.ListView = CompositeView.extend({
+  var CollectionView = Backbone.Ext.CollectionView = CompositeView.extend({
     // Override to look out for additional top level options.
     _configure: function (options) {
       CompositeView.prototype._configure.call(this, options);
-      _.each(listViewOptions, function (attr) {
+      _.each(collViewOptions, function (attr) {
         if (options[attr]) this[attr] = options[attr];
       }, this);
     },
@@ -303,18 +303,18 @@
     },
 
     // Handler to respond to `remove` events on the collection. Deregisters,
-    // removes, and releases the child view associated with the model.
+    // removes, and disposes the child view associated with the model.
     _removeModel: function (model, collection, options) {
       var view = this.deregisterChild(null, { at: options.index });
-      view.remove().release();
+      view.remove().dispose();
       if (collection.length === 0) this.renderEmpty();
     },
 
     // Handler to respond to `reset` events on the collection. Removes and
-    // releases the old views, resyncs the views, and rerenders.
+    // disposes the old views, resyncs the views, and rerenders.
     _resetCollection: function (collection) {
       _.each(this.children, function (child) {
-        child.remove().release();
+        child.remove().dispose();
       });
       this.syncViews();
       this.render();
